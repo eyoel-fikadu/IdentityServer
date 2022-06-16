@@ -1,9 +1,9 @@
-﻿using IdentityServer.Model.DomainModels;
+﻿using IdentityServer.API.Context.Implementation;
+using IdentityServer.API.Context.Interface;
+using IdentityServer.Model.DomainModels;
 using IdentityServer.Persistance.DatabaseContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace IdentityServer.Persistance
@@ -33,6 +33,18 @@ namespace IdentityServer.Persistance
                 {
                     options.ConfigureDbContext = b => b.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationAssembly));
                 });
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 6;
+            });
+
+
+            services.AddScoped<IUserManagerContext, UserManagerContext>();
             return services;
         }
     }

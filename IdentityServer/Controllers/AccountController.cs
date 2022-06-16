@@ -1,25 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IdentityServer.API.Context.Interface;
+using IdentityServer.API.Model.Dto.RequestDto;
+using IdentityServer.API.Model.Dto.ResponseDto;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityServer.API.Controllers
 {
     [ApiController]
-    [Route("api/Games")]
+    [Route("api/Account")]
     public class AccountController : ControllerBase
     {
-        public IActionResult Post(UserModel user)
+        private readonly IUserManagerContext _userManagerContext;
+
+        public AccountController(IUserManagerContext userManagerContext)
         {
-            return Ok(new UserResponse());
+            _userManagerContext=userManagerContext;
         }
 
-        public class UserModel
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(bool))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
+        public async Task<IActionResult> RegisterUser(UserRequestDto user)
         {
-            public string UserName { get; set; }
-            public string Password { get; set; }
-        }
-
-        public class UserResponse
-        {
-            public string Code { get; set; }
+            try
+            {
+                await _userManagerContext.CreateUser(user);
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
     }
 }
