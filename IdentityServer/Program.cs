@@ -1,8 +1,9 @@
 using IdentityServer.Persistance;
 using IdentityServer.Persistance.DatabaseContext;
-using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var allowedOrigins = "_allowedOrigins";
 
 // Add services to the container.
 
@@ -10,6 +11,18 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: allowedOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000");
+            //policy.AllowAnyOrigin();
+            policy.AllowAnyMethod();
+            policy.AllowAnyHeader();
+        });
+});
 
 
 DependencyInjection.AddApplicationServices(builder.Services, builder.Configuration);
@@ -26,6 +39,8 @@ if (app.Environment.IsDevelopment())
 
 DatabaseInitializer.PopulateIdentityServer(app);
 
+
+app.UseCors(allowedOrigins);
 
 app.UseHttpsRedirection();
 
