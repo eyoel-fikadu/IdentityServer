@@ -1,6 +1,5 @@
 ﻿using IdentityServer.API.Context.Interface;
 using IdentityServer.API.Model.Dto.RequestDto;
-using IdentityServer.API.Model.Dto.ResponseDto;
 using IdentityServer.Model.DomainModels;
 using Microsoft.AspNetCore.Identity;
 
@@ -36,6 +35,20 @@ namespace IdentityServer.API.Context.Implementation
                 return true;
             }
             throw new NullReferenceException();
+        }
+
+        public async Task<bool> IsEmailExists(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return false;
+            return true;
+        }
+
+        public async Task<bool> IsUserNameExists(string userName)
+        {
+            var user = await _userManager.FindByIdAsync(userName);
+            if (user == null) return false;
+            return true;
         }
     }
 }
