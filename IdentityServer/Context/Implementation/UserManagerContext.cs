@@ -2,6 +2,7 @@
 using IdentityServer.API.Model.Dto.RequestDto;
 using IdentityServer.Model.DomainModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace IdentityServer.API.Context.Implementation
 {
@@ -23,7 +24,7 @@ namespace IdentityServer.API.Context.Implementation
                     UserName = user.UserName,
                     Email = user.Email,
                     EmailConfirmed = false,
-                    PhoneNumber = user.PhoneNumber,
+                    PhoneNumber = "",
                     PhoneNumberConfirmed = false
                 },user.Password);
 
@@ -39,14 +40,14 @@ namespace IdentityServer.API.Context.Implementation
 
         public async Task<bool> IsEmailExists(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.NormalizedEmail.Trim() == email.Trim().ToUpper());
             if (user == null) return false;
             return true;
         }
 
         public async Task<bool> IsUserNameExists(string userName)
         {
-            var user = await _userManager.FindByIdAsync(userName);
+            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.NormalizedUserName.Trim() == userName.Trim().ToUpper());
             if (user == null) return false;
             return true;
         }

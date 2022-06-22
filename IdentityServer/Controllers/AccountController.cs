@@ -1,4 +1,5 @@
 ﻿using IdentityServer.API.Context.Interface;
+using IdentityServer.API.Model;
 using IdentityServer.API.Model.Dto.RequestDto;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,16 +20,17 @@ namespace IdentityServer.API.Controllers
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
+        [ProducesResponseType(422)]
         public async Task<IActionResult> RegisterUser(UserRequestDto user)
         {
             try
             {
-                await _userManagerContext.CreateUser(user);
-                return Ok(true);
+                var value = await _userManagerContext.CreateUser(user);
+                return Ok(ResponseModel.GetSuccess(value));
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ResponseModel.GetError(ex));
             }
             
         }
@@ -38,9 +40,10 @@ namespace IdentityServer.API.Controllers
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
-        public async Task<bool> IsUserNameExists(string userName)
+        public async Task<IActionResult> IsUserNameExists(string userName)
         {
-            return await _userManagerContext.IsUserNameExists(userName);
+            var result = await _userManagerContext.IsUserNameExists(userName);
+            return Ok(ResponseModel.GetSuccess(result));
         }
 
         [HttpGet]
@@ -48,9 +51,10 @@ namespace IdentityServer.API.Controllers
         [ProducesResponseType(200, Type = typeof(bool))]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
-        public async Task<bool> IsEmailExists(string email)
+        public async Task<IActionResult> IsEmailExists(string email)
         {
-            return await _userManagerContext.IsEmailExists(email);
+            var result = await _userManagerContext.IsEmailExists(email);
+            return Ok(ResponseModel.GetSuccess(result));
         }
     }
 }
